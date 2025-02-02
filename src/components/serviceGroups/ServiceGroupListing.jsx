@@ -1,5 +1,5 @@
 /*
- * Filename: /home/codestax/statusPage/vite-project/src/components/userManagement/UserListingTable.jsx
+ * Filename: /home/codestax/statusPage/vite-project/src/components/userManagement/ServiceGroupListing.jsx
  * Path: /home/codestax/statusPage/vite-project
  * Created Date: Saturday, February 1st 2025, 6:33:59 pm
  * Author: Prakersharya
@@ -12,30 +12,31 @@ import CustomTable from '../commonUI/CustomTable';
 import axiosInstance from '@/lib/axiosHelper';
 import TableSkeleton from '../commonUI/TableSkeleton';
 import { Edit, Trash2 } from 'lucide-react';
-
-export const UserListingTable = ({fetchAgain}) => {
-    const [isDataFetching, setIsDataFetching] = useState(true);
-    useEffect(() => {
-        setIsDataFetching(true);
-        fetchTableData();
-    }, [fetchAgain])
-
-    const fetchTableData = async () => {
-        await axiosInstance.get('/allrace');
-        setIsDataFetching(false);
-    }
+import useApi from '@/hooks/use-api';
+const colapsed = [
+    { value: "false", label: "Always Expanded" },
+    { value: "true", label: "Always Collapsed" },
+];
+export const ServiceGroupListing = ({fetchAgain, callEdit}) => {
+     const apiCall = useApi({
+            url: 'service-group/list',
+            method: "GET"
+        });
+        useEffect(() => {
+            apiCall.refetch();
+        }, [fetchAgain])
     const columns = [
         {
             header: "Name",
-            accessor: "name",
+            accessor: "serviceGroupName",
         },
         {
-            header: "Email",
-            accessor: "email",
+            header: "Visibility",
+            accessor: "visibility",
         },
         {
-            header: "Role",
-            cell: (row) => <span className="font-medium">{row.role}</span>,
+            header: "collapsed",
+            cell: (row) => <span className="font-medium">{row.collapsed ? 'Always Collapsed': 'Always Expanded'}</span>,
         },
         {
             header: "Actions",
@@ -58,27 +59,36 @@ export const UserListingTable = ({fetchAgain}) => {
         },
     ];
 
-    const data = [
-        { name: "John Doe", email: "john@example.com", role: "Admin" },
-        { name: "Jane Smith", email: "jane@example.com", role: "Manager" },
-        { name: "Alice Johnson", email: "alice@example.com", role: "Viewer" },
-    ];
+    
 
     const handleEdit = (row) => {
         console.log("Edit:", row);
+        console.log({
+            name: row.serviceGroupName || "",
+            serviceGroupID: row.serviceGroupID || "",
+            visibility: row.visibility || "",
+            colapsed: row.collapsed
+        })
+
+        callEdit({
+            name: row.serviceGroupName || "",
+            serviceGroupID: row.serviceGroupID || "",
+            visibility: row.visibility || "",
+            colapsed: row.collapsed
+        })
     };
 
     const handleDelete = (row) => {
         console.log("Delete:", row);
     };
 
-    if (isDataFetching) {
+    if (apiCall.loading) {
         return (<TableSkeleton />)
     }
     return (
         
         <div>
-            <CustomTable columns={columns} data={data} />
+            <CustomTable columns={columns} data={apiCall.data.listItems} />
         </div>
     );
 }

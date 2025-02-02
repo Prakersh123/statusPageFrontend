@@ -18,7 +18,7 @@ export const SingleServiceStatus = ({data}) => {
                 {
                   data.services.map((item)=>{
                     return <>
-                      <h1>{item.label}</h1>
+                      <h1 className='my-4'>{item.label}</h1>
                       <ServiceStatusButtons selectHandle={()=>{}} defaultValue={item.stage.value}/>                      
                     </>
                   })

@@ -19,19 +19,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import axiosInstance from "@/lib/axiosHelper";
 const visibility = [
   { value: "users", label: "Users" },
-  { value: "Guests", label: "Guests" },
-  { value: "Always Hidden", label: "Always Hidden" },
+  { value: "guests", label: "Guests" },
+  { value: "alwayshidden", label: "Always Hidden" },
 ];
 
 const colapsed = [
-  { value: "expanded", label: "Always Expanded" },
-  { value: "collapsed", label: "Always Collapsed" },
+  { value: false, label: "Always Expanded" },
+  { value: true, label: "Always Collapsed" },
 ];
-export const CreateServiceGroupDialogContent = ({ saveChanges }) => {
+export const CreateServiceGroupDialogContent = ({ saveChanges,  initialData={} , isUpdateClicked = false }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    visibility: "",
-    colapsed: ""
+    name: initialData.name || "",
+    visibility: initialData.visibility || "",
+    colapsed: initialData.colapsed || ""
   });
   const [buttonData, setButtonData] = useState({
     loading: false,
@@ -68,13 +68,30 @@ export const CreateServiceGroupDialogContent = ({ saveChanges }) => {
 
   const handleSubmit = async () => {
 
-    if (validateForm()) {
+    if (validateForm() || 5) {
       setButtonData({
         disabled: true,
         loading: true
       });
       try {
-        await axiosInstance.post('/service-group', {});
+        const data = 
+          {
+            name: formData.name,
+            visibility: formData.visibility,
+            collapsed: formData.colapsed
+          }
+        
+          if (isUpdateClicked) {
+            await axiosInstance.put('/service-group', {...data, serviceGroupID: initialData.serviceGroupID});
+          } else 
+          {
+            await axiosInstance.post('/service-group', data);
+          }
+        // await axiosInstance.post('/service-group', {
+        //   name: formData.name,
+        //   visibility: formData.visibility,
+        //   collapsed: formData.colapsed
+        // });
         toast({
           title: "Group Added",
           description: `${formData.name} got added!`,
@@ -117,7 +134,7 @@ export const CreateServiceGroupDialogContent = ({ saveChanges }) => {
       {/* Visibility Selection */}
       <div>
         <Label htmlFor="Visibility">Visibility</Label>
-        <Select onValueChange={handleVisibilityChange}>
+        <Select onValueChange={handleVisibilityChange} value={formData.visibility}>
           <SelectTrigger id="Visibility">
             <SelectValue placeholder="Select a Visibility" />
           </SelectTrigger>
@@ -135,7 +152,7 @@ export const CreateServiceGroupDialogContent = ({ saveChanges }) => {
       {/* Visibility Selection */}
       <div>
         <Label htmlFor="colapsed">Collapsed</Label>
-        <Select onValueChange={handleCollapsedChange}>
+        <Select onValueChange={handleCollapsedChange} value={formData.colapsed}>
           <SelectTrigger id="colapsed">
             <SelectValue placeholder="Select value" />
           </SelectTrigger>
@@ -152,7 +169,7 @@ export const CreateServiceGroupDialogContent = ({ saveChanges }) => {
 
       {/* Submit Button */}
       <Button className="w-full" onClick={handleSubmit} disabled={buttonData.disabled}>
-{buttonData.loading? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Group'}
+{buttonData.loading? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Save'}
       </Button>
     </div>
   );

@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import axiosInstance from "@/lib/axiosHelper";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export const CreateUserDialogContent = ({ saveChanges }) => {
   const [formData, setFormData] = useState({
@@ -20,8 +23,13 @@ export const CreateUserDialogContent = ({ saveChanges }) => {
     password: "",
     role: "",
   });
+    const [buttonData, setButtonData] = useState({
+      loading: false,
+      disabled: false
+    });
 
   const [errors, setErrors] = useState({});
+  const { toast } = useToast()
 
   const roles = [
     { value: "admin", label: "Admin" },
@@ -51,9 +59,39 @@ export const CreateUserDialogContent = ({ saveChanges }) => {
     setErrors({ ...errors, role: "" });
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      saveChanges(formData);
+  const handleSubmit = async() => {
+    if (validateForm() || 5) {
+      setButtonData({
+        disabled: true,
+        loading: true
+      });
+      try {
+        await axiosInstance.post('/user', {
+          name: formData.name,
+          emailID: formData.email,
+          password: formData.password,
+          role: formData.role
+        });
+        toast({
+          title: "Service Added",
+          description: `${formData.name} got added!`,
+          durattion: 3000
+        })
+        saveChanges(formData);
+      } catch(error) {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem with your request.",
+        })
+      } finally {
+        setButtonData({
+          disabled: false,
+          loading: false
+        });
+      }
+
+
     }
   };
 
@@ -120,8 +158,8 @@ export const CreateUserDialogContent = ({ saveChanges }) => {
       </div>
 
       {/* Submit Button */}
-      <Button className="w-full" onClick={handleSubmit}>
-        Create User
+      <Button className="w-full" onClick={handleSubmit} disabled={buttonData.disabled}>
+{buttonData.loading? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Save'}
       </Button>
     </div>
   );

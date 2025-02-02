@@ -24,6 +24,7 @@ import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { IncidentStatusButtons } from "../commonUI/IncidentStatusButtons";
 import DateTimeInput from "../commonUI/CustomDateTimInput";
+import { comment } from "postcss";
 const visibility = [
   { value: "users", label: "Users" },
   { value: "Guests", label: "Guests" },
@@ -34,18 +35,20 @@ const colapsed = [
   { value: "expanded", label: "Always Expanded" },
   { value: "collapsed", label: "Always Collapsed" },
 ];
-export const CreateIncident = ({ saveChanges }) => {
+export const CreateIncident = ({ saveChanges, initialData, isUpdateClicked }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    serviceGroup: "",
-    status: false,
-    stage: "",
-    description: ""
+    name: initialData.name || "",
+    serviceGroup: initialData.serviceGroup || "",
+    stage: initialData.stage || "",
+    description: initialData.description || "",
+    comment: initialData.comment || ""
+
   });
 
-  const [selectedDateTime, setSelectedDateTime] = useState(null);
+  const [selectedDateTime, setSelectedDateTime] = useState("" || '');
 
   const handleDateChange = (date) => {
+    console.log(date);
     setSelectedDateTime(date);
   };
 
@@ -55,7 +58,7 @@ export const CreateIncident = ({ saveChanges }) => {
     disabled: false
   });
   const apiCall = useApi({
-    url: '/service-group',
+    url: '/service/list',
     method: 'GET',
   }); 
 
@@ -78,9 +81,9 @@ export const CreateIncident = ({ saveChanges }) => {
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  const handleVisibilityChange = (value) => {
-    setFormData({ ...formData, visibility: value });
-    setErrors({ ...errors, visibility: "" });
+  const handleServiceChange = (value) => {
+    setFormData({ ...formData, serviceGroup: value });
+    setErrors({ ...errors, serviceGroup: "" });
   };
   const handleStageSelection = (value) => {
     setFormData({ ...formData, stage: value });
@@ -96,7 +99,22 @@ export const CreateIncident = ({ saveChanges }) => {
         loading: true
       });
       try {
-        await axiosInstance.post('/service', {});
+        
+        const data = {
+          name: formData.name,
+          description: formData.description,
+          serviceID: formData.serviceGroup,
+          stage: formData.stage,
+          comments: formData.comment,
+          dateTimeValue: Date(selectedDateTime)
+        }
+        if (isUpdateClicked) {
+          await axiosInstance.put('/incident', {...data, incidentID: initialData.incidentID});
+        } else 
+        {
+          await axiosInstance.post('/incident',   data);
+        }
+
         toast({
           title: "Service Added",
           description: `${formData.name} got added!`,
@@ -104,6 +122,8 @@ export const CreateIncident = ({ saveChanges }) => {
         })
         saveChanges(formData);
       } catch(error) {
+
+        console.log(error);
         toast({
           variant: "destructive",
           title: "Uh oh! Something went wrong.",
@@ -138,17 +158,21 @@ export const CreateIncident = ({ saveChanges }) => {
         {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
       </div>
 
+      <div>
+      <Label htmlFor="description">Description</Label>
+      <Textarea placeholder="Description" id="description" name="description" value={formData.description} onChange={handleChange}/>
+      </div>
       {/* Visibility Selection */}
       <div>
         <Label htmlFor="selectGroup">Service</Label>
-        <Select onValueChange={handleVisibilityChange}>
+        <Select onValueChange={handleServiceChange} value={formData.serviceGroup}>
           <SelectTrigger id="selectGroup">
-            <SelectValue placeholder="Select the Group" />
+            <SelectValue placeholder="Select the service" />
           </SelectTrigger>
           <SelectContent>
-            {apiCall.data.list.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
+            {apiCall.data.listItems.map((item) => (
+              <SelectItem key={item.serviceID} value={item.serviceID}>
+                {item.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -159,24 +183,20 @@ export const CreateIncident = ({ saveChanges }) => {
       {/* Visibility Selection */}
       <div >
         <Label htmlFor="name">Current Stage</Label>
-          <IncidentStatusButtons selectHandle={handleStageSelection}/>
+          <IncidentStatusButtons selectHandle={handleStageSelection} defaultValue={formData.stage}/>
       </div>
-
-      {/* <div className="flex items-center">
-        <Label htmlFor="airplane-mode" className="mr-2" >Enable/Disable</Label>            
-        <Switch id="airplane-mode" checked={formData.status} onCheckedChange={(v)=>{setFormData({...formData, status: v})}}/>
-      </div> */}
+      <div>
+      <Label htmlFor="comment">Comments</Label>
+      <Textarea placeholder="Add Comments for stage change if required" id="comment" name="comment" value={formData.comment} onChange={handleChange}/>
+      </div>
       <DateTimeInput
-        label="Choose a date and time"
+        label="Occured at"
         value={selectedDateTime}
         onChange={handleDateChange}
         onSubmit={handleSubmit}
         buttonText="Submit"
       />
-      <div>
-      <Label htmlFor="description">Description</Label>
-      <Textarea placeholder="Description" id="description" name="description" value={formData.description} onChange={handleChange}/>
-      </div>
+
 
       {/* Submit Button */}
       <Button className="w-full" onClick={handleSubmit} disabled={buttonData.disabled}>

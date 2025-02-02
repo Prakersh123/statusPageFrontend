@@ -22,29 +22,40 @@ export default function Services() {
     const [buttonLoading, setButtonLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [reloadTable, setReloadTable] = useState(false);
+    const [intialData, setInitialData] = useState({});
+    const [isUpdateClicked, setIsUpdateClicked] = useState({});
 
 
     const handleHeadingButtonClick = () => {
       setOpenDialog(true);
       setButtonLoading(true);
+      setIsUpdateClicked(false);
     }
     const saveUserData = (body) => {
       setOpenDialog(false);
       setReloadTable(true);
+      setIsUpdateClicked(false);
       setButtonLoading(false);
       console.log(body);
     }
   
+    const callEdit = (body) => {
+      setOpenDialog(true);
+      setButtonLoading(true);
+      setInitialData(body);
+      setIsUpdateClicked(true)
+      console.log(body);
+    }
     return <>
       <MainMenuTemplate> 
         <HeadingTemplate headingTab="Services" buttonText="New Service" isButtonAllow={true} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
         
         {/* Create User Dialog Starts */}
-        <CustomDialog open={openDialog} onOpenChange={() =>{setOpenDialog(true)}} dialogTitle="Create/Edit Service Group" dialogDescription="">
-          <CreateServiceDialogContent saveChanges={saveUserData}/>
+        <CustomDialog open={openDialog} onOpenChange={() =>{setOpenDialog(true)}} dialogTitle="Create/Edit Service Group" dialogDescription="" >
+          <CreateServiceDialogContent saveChanges={saveUserData} initialData= {intialData} isUpdateClicked={isUpdateClicked} />
         </CustomDialog>
         {/* User Listing Table */}
-        <ServiceListing fetchAgain={reloadTable} />
+        <ServiceListing fetchAgain={reloadTable} callEdit={callEdit}/>
       </MainMenuTemplate>
     </>
   }

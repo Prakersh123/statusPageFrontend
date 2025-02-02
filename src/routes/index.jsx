@@ -12,6 +12,7 @@ import Incidents from '@/app/dashboard/Incidents.jsx';
 import ServiceGroups from '@/app/dashboard/ServiceGroups.jsx';
 import Services from '@/app/dashboard/Services.jsx';
 import Layout from '@/app/layout.jsx';
+import LoginPage from '@/app/login/page.jsx';
 import { lazy } from 'react';
 
 // Lazy load pages for better performance
@@ -25,7 +26,10 @@ const routes = [
     path: '/',
     element: <Layout><HomeDashboard/></Layout>,
   },
-
+  {
+    path: '/login',
+    element: <LoginPage />
+  },
   {
     path: 'service-groups',
     element: <Layout><ServiceGroups></ServiceGroups></Layout>,

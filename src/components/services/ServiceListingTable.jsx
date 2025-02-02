@@ -15,9 +15,9 @@ import { CircleCheckBig, DeleteIcon, Edit, ShieldX, Trash2 } from 'lucide-react'
 import useApi from '@/hooks/use-api';
 import { Switch } from '../ui/switch';
 
-export const ServiceListing = ({fetchAgain}) => {
+export const ServiceListing = ({fetchAgain, callEdit}) => {
     const apiCall = useApi({
-        url: '/service',
+        url: '/service/list',
         method: 'GET'
     });
     useEffect(() => {
@@ -69,14 +69,25 @@ export const ServiceListing = ({fetchAgain}) => {
         },
     ];
 
-    const data = [
-        { name: "John Doe", email: "john@example.com", role: "Admin" },
-        { name: "Jane Smith", email: "jane@example.com", role: "Manager" },
-        { name: "Alice Johnson", email: "alice@example.com", role: "Viewer" },
-    ];
 
     const handleEdit = (row) => {
-        console.log("Edit:", row);
+        console.log({
+            name: row.name || "",
+            serviceGroup: row.group.id || "",
+            status: row.status || false,
+            stage: row.stage.value || '',
+            description: row.description || "",
+            serviceID: row.serviceID
+        });
+        callEdit({
+            name: row.name || "",
+            serviceGroup: row.group.id || "",
+            status: row.status || false,
+            stage: row.stage.value || '',
+            description: row.description || "",
+            serviceID: row.serviceID
+        });
+        // console.log("Edit:", row);
     };
 
     const handleDelete = (row) => {
@@ -89,7 +100,7 @@ export const ServiceListing = ({fetchAgain}) => {
     return (
         
         <div>
-            <CustomTable columns={columns} data={apiCall.data.list} />
+            <CustomTable columns={columns} data={apiCall.data.listItems} />
         </div>
     );
 }

@@ -1,5 +1,5 @@
 /*
- * Filename: /home/codestax/statusPage/vite-project/src/components/userManagement/ServiceListing.jsx
+ * Filename: /home/codestax/statusPage/vite-project/src/components/userManagement/IncidentListing.jsx
  * Path: /home/codestax/statusPage/vite-project
  * Created Date: Saturday, February 1st 2025, 6:33:59 pm
  * Author: Prakersharya
@@ -15,9 +15,9 @@ import { CircleCheckBig, DeleteIcon, Edit, ShieldX, Trash2 } from 'lucide-react'
 import useApi from '@/hooks/use-api';
 import { Switch } from '../ui/switch';
 
-export const ServiceListing = ({fetchAgain}) => {
+export const IncidentListing = ({fetchAgain, callEdit}) => {
     const apiCall = useApi({
-        url: '/service',
+        url: '/incident/list',
         method: 'GET'
     });
     useEffect(() => {
@@ -37,16 +37,12 @@ export const ServiceListing = ({fetchAgain}) => {
         },
         {
             header: "Stage",
-            cell: (row) => <span>{row.stage.label}</span>,
+            cell: (row) => <span>{row.currentStage.label}</span>,
 
         },
         {
             header: "Group",
-            cell: (row) => <span className="font-medium">{row.group.label}</span>,
-        },
-        {
-            header: "Status",
-            cell: (row) => <Switch checked={row.status} />,
+            cell: (row) => <span className="font-medium">{row.serviceGroup.label}</span>,
         },
         {
             header: "Actions",
@@ -69,14 +65,25 @@ export const ServiceListing = ({fetchAgain}) => {
         },
     ];
 
-    const data = [
-        { name: "John Doe", email: "john@example.com", role: "Admin" },
-        { name: "Jane Smith", email: "jane@example.com", role: "Manager" },
-        { name: "Alice Johnson", email: "alice@example.com", role: "Viewer" },
-    ];
-
     const handleEdit = (row) => {
-        console.log("Edit:", row);
+        console.log("Edit:", row, {   
+            name: row.name || "",
+            serviceGroup: row.service.value || "",
+            stage: row.currentStage.value || "",
+            description: row.description || "",
+            comment: row.updates[row.updates.length-1].comment || "",
+            dateTimeValue: row.updates[row.updates.length-1].performedAt || "",
+            incidentID: row.incidentID
+        });
+
+        callEdit({   
+            name: row.name || "",
+            serviceGroup: row.service.value || "",
+            stage: row.currentStage.value || "",
+            description: row.description || "",
+            comment: row.updates[row.updates.length-1].comment || "",
+            dateTimeValue: Date(row.updates[row.updates.length-1].performedAt) || "",
+        })
     };
 
     const handleDelete = (row) => {
@@ -89,7 +96,7 @@ export const ServiceListing = ({fetchAgain}) => {
     return (
         
         <div>
-            <CustomTable columns={columns} data={apiCall.data.list} />
+            <CustomTable columns={columns} data={apiCall.data.listItems} />
         </div>
     );
 }

@@ -16,7 +16,7 @@ const CustomCollapsible = ({ title, children, defaultOpen = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full border rounded-lg p-3">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full border rounded-lg p-3 mb-4">
       <CollapsibleTrigger asChild>
         <Button
           variant="ghost"

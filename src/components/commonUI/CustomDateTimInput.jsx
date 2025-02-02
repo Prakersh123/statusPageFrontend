@@ -10,12 +10,13 @@
 import React from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Button, Label } from '@shadcn/ui';
+import { Label } from '../ui/label';
+import { Button } from '../ui/button';
 
 const DateTimeInput = ({ label, value, onChange, onSubmit, buttonText }) => {
   return (
     <div className="space-y-4">
-      <div>
+      <div className='flex flex-col '>
         <Label htmlFor="datetime">{label}</Label>
         <DatePicker
           id="datetime"
@@ -25,16 +26,11 @@ const DateTimeInput = ({ label, value, onChange, onSubmit, buttonText }) => {
           timeFormat="HH:mm"
           dateFormat="MMMM d, yyyy h:mm aa"
           timeIntervals={15}
-          className="shadcn-input" // ShadCN styled input
+          className="border border-gray-300 p-2 rounded-md w-full bg-red text-black focus:outline-none focus:ring-2 focus:ring-blue-500" // Custom input styles
           placeholderText="Select date and time"
         />
       </div>
 
-      <div>
-        <Button onClick={onSubmit} className="w-full">
-          {buttonText}
-        </Button>
-      </div>
     </div>
   );
 };

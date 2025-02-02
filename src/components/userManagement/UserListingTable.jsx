@@ -11,21 +11,20 @@ import React, { useEffect, useState } from 'react'
 import CustomTable from '../commonUI/CustomTable';
 import { useToast } from "@/hooks/use-toast"
 
-import axiosInstance from '@/lib/axiosHelper';
 import TableSkeleton from '../commonUI/TableSkeleton';
 import { Edit, Trash2 } from 'lucide-react';
+import useApi from '@/hooks/use-api';
 
 export const UserListingTable = ({fetchAgain}) => {
-    const [isDataFetching, setIsDataFetching] = useState(true);
+    const apiCall = useApi({
+        url: 'user/users',
+        method: "GET"
+    });
     useEffect(() => {
-        setIsDataFetching(true);
-        fetchTableData();
+        apiCall.refetch();
     }, [fetchAgain])
 
-    const fetchTableData = async () => {
-        await axiosInstance.get('auth/allrace');
-        setIsDataFetching(false);
-    }
+    
     const columns = [
         {
             header: "Name",
@@ -33,7 +32,7 @@ export const UserListingTable = ({fetchAgain}) => {
         },
         {
             header: "Email",
-            accessor: "email",
+            accessor: "emailID",
         },
         {
             header: "Role",
@@ -60,11 +59,6 @@ export const UserListingTable = ({fetchAgain}) => {
         },
     ];
 
-    const data = [
-        { name: "John Doe", email: "john@example.com", role: "Admin" },
-        { name: "Jane Smith", email: "jane@example.com", role: "Manager" },
-        { name: "Alice Johnson", email: "alice@example.com", role: "Viewer" },
-    ];
 
     const handleEdit = (row) => {
         console.log("Edit:", row);
@@ -74,13 +68,13 @@ export const UserListingTable = ({fetchAgain}) => {
         console.log("Delete:", row);
     };
 
-    if (isDataFetching) {
+    if (apiCall.loading) {
         return (<TableSkeleton />)
     }
     return (
         
         <div>
-            <CustomTable columns={columns} data={data} />
+            <CustomTable columns={columns} data={apiCall.data.userList} />
         </div>
     );
 }

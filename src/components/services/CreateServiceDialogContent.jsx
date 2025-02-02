@@ -32,27 +32,27 @@ const colapsed = [
   { value: "expanded", label: "Always Expanded" },
   { value: "collapsed", label: "Always Collapsed" },
 ];
-export const CreateServiceDialogContent = ({ saveChanges }) => {
+export const CreateServiceDialogContent = ({ saveChanges, initialData={} , isUpdateClicked = false}) => {
   const [formData, setFormData] = useState({
-    name: "",
-    serviceGroup: "",
-    status: false,
-    stage: "",
-    description: ""
+    name: initialData.name || "",
+    serviceGroup: initialData.serviceGroup || "",
+    status: initialData.status || false,
+    stage: initialData.stage || '',
+    description: initialData.description || ""
   });
   const [buttonData, setButtonData] = useState({
     loading: false,
     disabled: false
   });
   const apiCall = useApi({
-    url: '/service-group',
+    url: '/service-group/list',
     method: 'GET',
   }); 
 
   const { toast } = useToast()
   const [errors, setErrors] = useState({});
 
-
+// useEffect(()=>{}, [initialData]); 
 
   const validateForm = () => {
     let newErrors = {};
@@ -68,9 +68,9 @@ export const CreateServiceDialogContent = ({ saveChanges }) => {
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  const handleVisibilityChange = (value) => {
-    setFormData({ ...formData, visibility: value });
-    setErrors({ ...errors, visibility: "" });
+  const handleServiceGroupChange = (value) => {
+    setFormData({ ...formData, serviceGroup: value });
+    setErrors({ ...errors, serviceGroup: "" });
   };
   const handleStageSelection = (value) => {
     setFormData({ ...formData, stage: value });
@@ -86,7 +86,20 @@ export const CreateServiceDialogContent = ({ saveChanges }) => {
         loading: true
       });
       try {
-        await axiosInstance.post('/service', {});
+        const data = {
+          name: formData.name,
+          status: formData.status,
+          stage: formData.stage,
+          serviceGroupID: formData.serviceGroup,
+          description: formData.description
+        }
+        if (isUpdateClicked) {
+          await axiosInstance.put('/service', {...data, serviceID: initialData.serviceID});
+        } else 
+        {
+          await axiosInstance.post('/service', data);
+        }
+
         toast({
           title: "Service Added",
           description: `${formData.name} got added!`,
@@ -131,14 +144,14 @@ export const CreateServiceDialogContent = ({ saveChanges }) => {
       {/* Visibility Selection */}
       <div>
         <Label htmlFor="selectGroup">Service Group</Label>
-        <Select onValueChange={handleVisibilityChange}>
+        <Select onValueChange={handleServiceGroupChange} value={formData.serviceGroup}>
           <SelectTrigger id="selectGroup">
             <SelectValue placeholder="Select the Group" />
           </SelectTrigger>
           <SelectContent>
-            {apiCall.data.list.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
+            {apiCall.data.listItems.map((item) => (
+              <SelectItem key={item.serviceGroupID} value={item.serviceGroupID}>
+                {item.serviceGroupName}
               </SelectItem>
             ))}
           </SelectContent>
@@ -149,7 +162,7 @@ export const CreateServiceDialogContent = ({ saveChanges }) => {
       {/* Visibility Selection */}
       <div >
         <Label htmlFor="name">Current Stage</Label>
-          <ServiceStatusButtons selectHandle={handleStageSelection}/>
+          <ServiceStatusButtons selectHandle={handleStageSelection} defaultValue={formData.stage}/>
       </div>
 
       <div className="flex items-center">

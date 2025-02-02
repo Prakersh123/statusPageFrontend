@@ -19,8 +19,15 @@ import { CreateServiceDialogContent } from "@/components/services/CreateServiceD
 import { ServiceListing } from "@/components/services/ServiceListingTable";
 import CustomCollapsible from "@/components/commonUI/CustomCollapsible";
 import { SingleServiceStatus } from "@/components/homeDashboard/SingleServiceStatus";
+import { IncidentUpdate } from "@/components/incidents/IncidentUpdate";
+import useApi from "@/hooks/use-api";
+import TableSkeleton from "@/components/commonUI/TableSkeleton";
 export default function HomeDashboard() {
 
+    const serviceAPICall = useApi({
+      url: 'service/dashboard',
+      method: 'GET'
+    });
     const [buttonLoading, setButtonLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [reloadTable, setReloadTable] = useState(false);
@@ -36,42 +43,77 @@ export default function HomeDashboard() {
       setButtonLoading(false);
       console.log(body);
     }
-    const obj = [
+    // const obj = [
+    //   {
+    //     serviceGroup: {
+    //       label: 'Database',
+    //       value: 'database'
+    //     },
+    //     services: [{
+    //       label: 'Mongodb',
+    //       value: 'uuid1',
+    //       stage: {
+    //         value: 'operational',
+    //         label: 'Operational'
+    //       }
+    //     }]
+    //   },
+    //   {
+    //     serviceGroup: {
+    //       label: 'Lambda',
+    //       value: 'lambda'
+    //     },
+    //     services: [{
+    //       label: 'Mymed Prod',
+    //       value: 'uuid1',
+    //       stage: {
+    //         value: 'performanceIssue',
+    //         label: 'Performance Issue'
+    //       }
+    //     }]
+    //   }
+    // ]
+    const incidentObj = [
       {
+        incidentName: 'VPN Block',
+        description: 'SOdsflkjdfsadjflsdjf',
+        id: '1233',
         serviceGroup: {
           label: 'Database',
           value: 'database'
         },
-        services: [{
+        service: {
           label: 'Mongodb',
           value: 'uuid1',
-          stage: {
-            value: 'operational',
-            label: 'Operational'
-          }
-        }]
-      },
-      {
-        serviceGroup: {
-          label: 'Lambda',
-          value: 'lambda'
         },
-        services: [{
-          label: 'Mymed Prod',
-          value: 'uuid1',
-          stage: {
-            value: 'performanceIssue',
-            label: 'Performance Issue'
+        updateList: [
+          {
+            stageLabel: 'Fixed',
+            stageValue: 'fixed',
+            comment: 'Prakersh arya ok',
+            dateValue: '2025-01-31 at 10:00 AM'
+          },
+          {
+            stageLabel: 'Identified',
+            stageValue: 'identified',
+            comment: 'Prakersh arya ok',
+            dateValue: '2025-01-31 at 10:00 AM'
           }
-        }]
-      }
+        ]
+      },
     ]
     return <>
       <MainMenuTemplate> 
         <HeadingTemplate headingTab="Dashboard" buttonText="New Service" isButtonAllow={false} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
         {
-          obj.map((serviceGroup)=>{
+          serviceAPICall.loading ? <TableSkeleton />:
+          serviceAPICall.data.listItems.map((serviceGroup)=>{
             return <SingleServiceStatus data={serviceGroup} key={serviceGroup.serviceGroup.value}/>
+          })
+        }
+        {
+          incidentObj.map((incidentItem)=>{
+            return <IncidentUpdate data={incidentItem} key={incidentItem.id}/>
           })
         }
 
