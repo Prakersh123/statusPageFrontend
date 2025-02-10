@@ -32,7 +32,8 @@ export default function CustomDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl w-full p-4 overflow-auto"> {/* Ensure max-width and prevent overflow */}        <DialogHeader>
+      <DialogContent className="max-w-4xl w-full p-4 overflow-auto"> {/* Ensure max-width and prevent overflow */}      
+          <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>

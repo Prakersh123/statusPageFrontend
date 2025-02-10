@@ -12,26 +12,42 @@ import MainMenuTemplate from "@/components/commonUI/MainMenuTemplate";
 import HeadingTemplate from "@/components/commonUI/HeadingTemplate";
 import CustomDialog from "@/components/commonUI/CustomeDialog";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateUserDialogContent } from "@/components/userManagement/CreateUserDialogContent";
 import { UserListingTable } from "@/components/userManagement/UserListingTable";
 import { CreateServiceDialogContent } from "@/components/services/CreateServiceDialogContent";
 import { ServiceListing } from "@/components/services/ServiceListingTable";
-import useView from "@/hooks/use-view";
-export default function Services() {
-    const {editAllowed} = useView();
+import { ServiceListingCustomer } from "@/components/services/ServiceListingCustomerSide";
+import webSocketHelper from "@/lib/webSocketHelper";
+import useApi from "@/hooks/use-api";
+import TableSkeleton from "@/components/commonUI/TableSkeleton";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchServices } from "@/store/reducers/serviceActions";
+import { IncidentUpdate } from "@/components/incidents/IncidentUpdate";
+import { fetchIncidents } from "@/store/reducers/incidentActions";
+import { useNavigate } from "react-router-dom";
+export default function CustomerScreen() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { serviceList, dataLoading } = useSelector((state) => state.service);
+    const incident = useSelector((state) => state.incident);
 
+    const [serviceData, setServiceData] = useState([]);
     const [buttonLoading, setButtonLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [reloadTable, setReloadTable] = useState(false);
     const [intialData, setInitialData] = useState({});
     const [isUpdateClicked, setIsUpdateClicked] = useState({});
+    
 
+     useEffect(()=> {
+        webSocketHelper.openConnection('12345');
+        dispatch(fetchServices());  
+        dispatch(fetchIncidents());
+      }, [dispatch]);
 
     const handleHeadingButtonClick = () => {
-      setOpenDialog(true);
-      setButtonLoading(true);
-      setIsUpdateClicked(false);
+      navigate('/');
     }
     const saveUserData = (body) => {
       setOpenDialog(false);
@@ -54,14 +70,15 @@ export default function Services() {
     }
     return <>
       <MainMenuTemplate> 
-        <HeadingTemplate headingTab="Services" buttonText="New Service" isButtonAllow={editAllowed} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
-        
-        {/* Create User Dialog Starts */}
-        <CustomDialog open={openDialog} onOpenChange={closeDialog} dialogTitle="Create/Edit Service Group" dialogDescription="" >
-          <CreateServiceDialogContent saveChanges={saveUserData} initialData= {intialData} isUpdateClicked={isUpdateClicked} />
-        </CustomDialog>
-        {/* User Listing Table */}
-        <ServiceListing fetchAgain={reloadTable} callEdit={callEdit}/>
+        <HeadingTemplate headingTab="Services" buttonText="Go to Dashboard" isButtonAllow={true} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
+        {
+            dataLoading ? <TableSkeleton/>: <ServiceListingCustomer  data={serviceList || []}/> 
+        }
+
+        <HeadingTemplate headingTab="Incidents" buttonText="New Service" isButtonAllow={false} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading} />
+        {
+            incident.dataLoading ? <TableSkeleton/>: incident.dataList.map((item) => (<IncidentUpdate key={item.incidentID} data={item}/>)) 
+        }
       </MainMenuTemplate>
     </>
   }

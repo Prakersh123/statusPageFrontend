@@ -83,7 +83,7 @@ export const IncidentUpdate = ({data}) => {
                           {item.stageLabel}
                           </Button>
                           <div className='flex flex-col items-start'>
-                            <span>Updated at: {item.dateValue}</span>
+                            <span className='mx-2'>{item.dateValue}</span>
                             <span>{item.comment}</span>
                           </div>
                         </div>

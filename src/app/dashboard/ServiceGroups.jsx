@@ -17,7 +17,9 @@ import { CreateUserDialogContent } from "@/components/userManagement/CreateUserD
 import { UserListingTable } from "@/components/userManagement/UserListingTable";
 import { CreateServiceGroupDialogContent } from "@/components/serviceGroups/CreateServiceGroupDialogContent";
 import { ServiceGroupListing } from "@/components/serviceGroups/ServiceGroupListing";
-export default function ServiceGroups() {
+import useView from "@/hooks/use-view";
+export default function ServiceGroups({userType}) {
+    const {editAllowed} = useView();
     const [buttonLoading, setButtonLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [reloadTable, setReloadTable] = useState(false);
@@ -42,12 +44,16 @@ export default function ServiceGroups() {
       setIsUpdateClicked(true)
       console.log(body);
     }
+    const closeDialog = () => {
+      setOpenDialog(false);
+      setButtonLoading(false);
+    }
     return <>
       <MainMenuTemplate> 
-        <HeadingTemplate headingTab="Service Groups" buttonText="New Group" isButtonAllow={true} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
+        <HeadingTemplate headingTab="Service Groups" buttonText="New Group" isButtonAllow={editAllowed} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
         
         {/* Create User Dialog Starts */}
-        <CustomDialog open={openDialog} onOpenChange={() =>{setOpenDialog(true)}} dialogTitle="Create New Service Group" dialogDescription="">
+        <CustomDialog open={openDialog} onOpenChange={closeDialog} dialogTitle="Create New Service Group" dialogDescription="">
           <CreateServiceGroupDialogContent saveChanges={saveUserData}  initialData= {intialData} isUpdateClicked={isUpdateClicked}/>
         </CustomDialog>
 

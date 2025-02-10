@@ -29,8 +29,9 @@ export const ServiceStatusButtons = ({selectHandle, defaultValue=''}) => {
   };
 
   return (
-    <div className="flex gap-2">
-      {statusOptions.map((item) => (
+
+<div className="flex gap-2 flex-row flex-wrap ">
+{statusOptions.map((item) => (
         <Button
           key={item.key}
           className={`flex items-center gap-2 ${item.color} ${selectedStatus === item.key ? "border-2 border-white rounded-2xl" : ""}`}

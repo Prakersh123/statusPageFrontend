@@ -14,7 +14,9 @@ import CustomDialog from "@/components/commonUI/CustomeDialog";
 import { useState } from "react";
 import { CreateUserDialogContent } from "@/components/userManagement/CreateUserDialogContent";
 import { UserListingTable } from "@/components/userManagement/UserListingTable";
+import useView from "@/hooks/use-view";
 export default function UserManagment() {
+    const {editAllowed} = useView();
     const [buttonLoading, setButtonLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [reloadTable, setReloadTable] = useState(false);
@@ -28,13 +30,17 @@ export default function UserManagment() {
       setButtonLoading(false);
       console.log(body);
     }
+    const closeDialog = () => {
+      setOpenDialog(false);
+      setButtonLoading(false);
+    }
   
     return <>
       <MainMenuTemplate> 
-        <HeadingTemplate headingTab="User Managment" buttonText="New User" isButtonAllow={true} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
+        <HeadingTemplate headingTab="User Managment" buttonText="New User" isButtonAllow={editAllowed} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
         
         {/* Create User Dialog Starts */}
-        <CustomDialog open={openDialog} onOpenChange={() =>{setOpenDialog(true)}} dialogTitle="Create User" dialogDescription="">
+        <CustomDialog open={openDialog} onOpenChange={closeDialog} dialogTitle="Create User" dialogDescription="">
           <CreateUserDialogContent saveChanges={saveUserData}/>
         </CustomDialog>
 

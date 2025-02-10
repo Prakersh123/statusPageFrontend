@@ -17,10 +17,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "../ui/input";
+import { useState } from "react";
 
 export default function CustomTable({ columns, data }) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter data based on search query
+  const filteredData = data.filter((row) =>
+    columns.some((column) => {
+      const value = column.accessor ? row[column.accessor] : column.cell(row);
+      return value?.toString().toLowerCase().includes(searchQuery.toLowerCase());
+    })
+  );
   return (
+    
     <div className="rounded-md border">
+      {/* Search Input */}
+      <div className="mb-4">
+        <Input
+          type="text"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full border p-2 rounded-md"
+        />
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -30,15 +52,23 @@ export default function CustomTable({ columns, data }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((row, rowIndex) => (
-            <TableRow key={rowIndex}>
-              {columns.map((column, colIndex) => (
-                <TableCell key={colIndex}>
-                  {column.accessor ? row[column.accessor] : column.cell(row)}
+        {filteredData.length > 0 ? (
+              filteredData.map((row, rowIndex) => (
+                <TableRow key={rowIndex}>
+                  {columns.map((column, colIndex) => (
+                    <TableCell key={colIndex}>
+                      {column.accessor ? row[column.accessor] : column.cell(row)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="text-center">
+                  No results found
                 </TableCell>
-              ))}
-            </TableRow>
-          ))}
+              </TableRow>
+            )}
         </TableBody>
       </Table>
     </div>

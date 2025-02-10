@@ -54,7 +54,7 @@ export const IncidentStatusButtons = ({selectHandle, defaultValue=''}) => {
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 flex-row flex-wrap ">
       {statusOptions.map((item) => (
         <Button
           key={item.key}

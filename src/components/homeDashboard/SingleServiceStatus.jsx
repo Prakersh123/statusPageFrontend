@@ -15,6 +15,7 @@ export const SingleServiceStatus = ({data}) => {
   return (
     <div className='mb-4'>
               <CustomCollapsible title={data.serviceGroup.label} defaultOpen={true}>
+              <div className="flex flex-row flex-wrap md:flex-col">
                 {
                   data.services.map((item)=>{
                     return <>
@@ -23,6 +24,7 @@ export const SingleServiceStatus = ({data}) => {
                     </>
                   })
                 }
+                </div>
               
               </CustomCollapsible>
 

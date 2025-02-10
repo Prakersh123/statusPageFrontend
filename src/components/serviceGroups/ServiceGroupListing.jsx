@@ -13,11 +13,14 @@ import axiosInstance from '@/lib/axiosHelper';
 import TableSkeleton from '../commonUI/TableSkeleton';
 import { Edit, Trash2 } from 'lucide-react';
 import useApi from '@/hooks/use-api';
+import useView from '@/hooks/use-view';
 const colapsed = [
     { value: "false", label: "Always Expanded" },
     { value: "true", label: "Always Collapsed" },
 ];
 export const ServiceGroupListing = ({fetchAgain, callEdit}) => {
+        const {editAllowed} = useView();
+    
      const apiCall = useApi({
             url: 'service-group/list',
             method: "GET"
@@ -41,18 +44,14 @@ export const ServiceGroupListing = ({fetchAgain, callEdit}) => {
         {
             header: "Actions",
             cell: (row) => (
+                
                 <div className="flex gap-2">
                     <button
                         className="px-2 py-1 bg-blue-500 text-white rounded"
                         onClick={() => handleEdit(row)}
+                        disabled={!editAllowed}
                     >
                         <Edit/>
-                    </button>
-                    <button
-                        className="px-2 py-1 bg-red-500 text-white rounded"
-                        onClick={() => handleDelete(row)}
-                    >
-                        <Trash2/>
                     </button>
                 </div>
             ),

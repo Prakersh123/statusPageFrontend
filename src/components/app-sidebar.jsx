@@ -7,7 +7,7 @@
  * Copyright (c) 2025 Trinom Digital Pvt Ltd
  */
 
-import { Calendar, LayoutDashboard, Inbox, CircleAlert, Settings, UsersRound } from "lucide-react"
+import { Calendar, LayoutDashboard, Inbox, CircleAlert, Settings, UsersRound, LogOut } from "lucide-react"
 
 import {
   Sidebar,
@@ -20,7 +20,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { Button } from "./ui/button"
+import axiosInstance from "@/lib/axiosHelper"
+import { useState } from "react"
 
 // Menu items.
 const items = [
@@ -45,23 +48,38 @@ const items = [
     icon: CircleAlert,
   },
   {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
-  {
     title: "User Management",
     url: "/user-managment",
+    icon: UsersRound,
+  },
+  {
+    title: "Live Dashboard",
+    url: "/customer",
     icon: UsersRound,
   },
 ]
 
 export function AppSidebar() {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      await axiosInstance.post('/user/logout');
+      localStorage.removeItem('token');
+      navigate('/login')
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+
+  }
   return (
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel><h1 style={{fontSize: '20px', color: 'red'}}>Codestax.AI</h1></SidebarGroupLabel>
+          <SidebarGroupLabel><h1 style={{fontSize: '20px', color: 'red'}}>XYZ Organization</h1></SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -80,7 +98,9 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-              Logout
+        <Button onClick={handleLogout} disabled={loading}>
+              <LogOut/>
+        </Button>
       </SidebarFooter>
     </Sidebar>
   )

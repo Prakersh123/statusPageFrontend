@@ -14,8 +14,10 @@ import { useToast } from "@/hooks/use-toast"
 import TableSkeleton from '../commonUI/TableSkeleton';
 import { Edit, Trash2 } from 'lucide-react';
 import useApi from '@/hooks/use-api';
+import useView from '@/hooks/use-view';
 
 export const UserListingTable = ({fetchAgain}) => {
+    const {editAllowed} = useView();
     const apiCall = useApi({
         url: 'user/users',
         method: "GET"
@@ -45,15 +47,12 @@ export const UserListingTable = ({fetchAgain}) => {
                     <button
                         className="px-2 py-1 bg-blue-500 text-white rounded"
                         onClick={() => handleEdit(row)}
+                        disabled={editAllowed}
+
                     >
                         <Edit/>
                     </button>
-                    <button
-                        className="px-2 py-1 bg-red-500 text-white rounded"
-                        onClick={() => handleDelete(row)}
-                    >
-                        <Trash2/>
-                    </button>
+
                 </div>
             ),
         },

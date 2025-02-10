@@ -7,6 +7,7 @@
  * Copyright (c) 2025 Trinom Digital Pvt Ltd
  */
 
+import CustomerScreen from '@/app/dashboard/CustomerScreen.jsx';
 import HomeDashboard from '@/app/dashboard/HomeDashboard.jsx';
 import Incidents from '@/app/dashboard/Incidents.jsx';
 import ServiceGroups from '@/app/dashboard/ServiceGroups.jsx';
@@ -18,6 +19,15 @@ import { lazy } from 'react';
 // Lazy load pages for better performance
 const UserManagment = lazy(() => import('../app/dashboard/userManagment.jsx'));
 
+const value = localStorage.getItem('userType');
+const getView = (value) => {
+  switch(value) {
+    case 'viewer':
+      return false;
+    default:
+      return true;
+  }
+}
 
 // Define your routes
 const routes = [
@@ -32,7 +42,7 @@ const routes = [
   },
   {
     path: 'service-groups',
-    element: <Layout><ServiceGroups></ServiceGroups></Layout>,
+    element: <Layout><ServiceGroups userType={getView(value)}></ServiceGroups></Layout>,
   },
   {
     path: 'services',
@@ -43,17 +53,13 @@ const routes = [
     element: <Layout><Incidents></Incidents></Layout>,
   },
   {
-    path: 'settings',
-    element: <Layout><UserManagment></UserManagment></Layout>,
-  },
-  {
     path: 'user-managment',
     element: <Layout><UserManagment></UserManagment></Layout>,
   },
-//   {
-//     path: '/about',
-//     element: <About />,
-//   },
+  {
+    path: '/customer',
+    element: <CustomerScreen />,
+  },
 //   {
 //     path: '/contact',
 //     element: <Contact />,

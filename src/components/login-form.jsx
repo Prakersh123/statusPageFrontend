@@ -57,6 +57,7 @@ export function LoginForm({
           });
           console.log(response);
           localStorage.setItem('token', response.token);
+          localStorage.setItem('userType', response.userType)
           navigate('/')
         
       } catch(error) {

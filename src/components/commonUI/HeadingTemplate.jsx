@@ -15,7 +15,7 @@ import { Button } from "../ui/button";
 export default function HeadingTemplate({headingTab, buttonText, handleButtonCallBack, buttonLoading, isButtonAllow}) {
     
     return (
-      <div className="flex justify-between items-center mb-10">
+      <div className="flex justify-between flex-wrap items-center mb-10">
         <h1 className="text-2xl font-bold mb-4">{headingTab}</h1>
         
         {isButtonAllow?<Button onClick={handleButtonCallBack} disabled={buttonLoading}><Plus/>{buttonText}</Button>:<></>}

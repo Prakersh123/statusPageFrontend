@@ -15,7 +15,9 @@ import CustomDialog from "@/components/commonUI/CustomeDialog";
 import { useState } from "react";
 import { CreateIncident } from "@/components/incidents/CreateIncident";
 import { IncidentListing } from "@/components/incidents/IncidentListing";
+import useView from "@/hooks/use-view";
 export default function Incidents() {
+        const {editAllowed} = useView();
 
     const [buttonLoading, setButtonLoading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
@@ -45,12 +47,16 @@ export default function Incidents() {
       console.log(body);
     }
   
+    const closeDialog = () => {
+      setOpenDialog(false);
+      setButtonLoading(false);
+    }
     return <>
       <MainMenuTemplate> 
-        <HeadingTemplate headingTab="Incidents" buttonText="New Incident" isButtonAllow={true} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
+        <HeadingTemplate headingTab="Incidents" buttonText="New Incident" isButtonAllow={editAllowed} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
         
         {/* Create User Dialog Starts */}
-        <CustomDialog open={openDialog} onOpenChange={() =>{setOpenDialog(true)}} dialogTitle="Create/Edit Incident" dialogDescription="">
+        <CustomDialog open={openDialog} onOpenChange={closeDialog} dialogTitle="Create/Edit Incident" dialogDescription="">
           <CreateIncident saveChanges={saveUserData} initialData= {intialData} isUpdateClicked={isUpdateClicked} />
         </CustomDialog>
         {/* User Listing Table */}

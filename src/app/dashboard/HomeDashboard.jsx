@@ -12,7 +12,7 @@ import MainMenuTemplate from "@/components/commonUI/MainMenuTemplate";
 import HeadingTemplate from "@/components/commonUI/HeadingTemplate";
 import CustomDialog from "@/components/commonUI/CustomeDialog";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateUserDialogContent } from "@/components/userManagement/CreateUserDialogContent";
 import { UserListingTable } from "@/components/userManagement/UserListingTable";
 import { CreateServiceDialogContent } from "@/components/services/CreateServiceDialogContent";
@@ -22,10 +22,16 @@ import { SingleServiceStatus } from "@/components/homeDashboard/SingleServiceSta
 import { IncidentUpdate } from "@/components/incidents/IncidentUpdate";
 import useApi from "@/hooks/use-api";
 import TableSkeleton from "@/components/commonUI/TableSkeleton";
+import webSocketHelper from "@/lib/webSocketHelper";
 export default function HomeDashboard() {
 
-    const serviceAPICall = useApi({
+ 
+  const serviceAPICall = useApi({
       url: 'service/dashboard',
+      method: 'GET'
+    });
+    const incidentAPICall = useApi({
+      url: 'incident/dashboard',
       method: 'GET'
     });
     const [buttonLoading, setButtonLoading] = useState(false);
@@ -105,14 +111,18 @@ export default function HomeDashboard() {
     return <>
       <MainMenuTemplate> 
         <HeadingTemplate headingTab="Dashboard" buttonText="New Service" isButtonAllow={false} handleButtonCallBack={handleHeadingButtonClick} buttonLoading={buttonLoading}/>
+        <h1 className="text-2xl font-bold mb-4 ">Services</h1>
+        
         {
           serviceAPICall.loading ? <TableSkeleton />:
           serviceAPICall.data.listItems.map((serviceGroup)=>{
             return <SingleServiceStatus data={serviceGroup} key={serviceGroup.serviceGroup.value}/>
           })
         }
+        <h1 className="text-2xl font-bold mb-4">Incidents</h1>
         {
-          incidentObj.map((incidentItem)=>{
+          incidentAPICall.loading ? <TableSkeleton />:
+          incidentAPICall.data.listItems.map((incidentItem)=>{
             return <IncidentUpdate data={incidentItem} key={incidentItem.id}/>
           })
         }
